@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class UdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private static final Logger logger = LoggerFactory.getLogger(UdpServerHandler.class);
 
@@ -27,6 +26,7 @@ public class UdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         int readableBytes = buf.readableBytes();
         byte[] content = new byte[readableBytes];
         buf.readBytes(content);
+        System.out.println("content= " + new String(content, "utf-8"));
         SocketDto dto = JSON.parseObject(content, SocketDto.class);
 
         if (dto.getSenderType() == 1) {
@@ -37,9 +37,17 @@ public class UdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             SocketDto temp = new SocketDto();
             temp.setId(dto.getId());
             temp.setSenderType(2);
+//            new InetSocketAddress("",1245);
+            System.out.println("ip=" + msg.sender().getHostName() + ",port=" + msg.sender().getPort());
             ctx.writeAndFlush(new DatagramPacket(Unpooled.wrappedBuffer(JSON.toJSONString(temp).getBytes()), msg.sender()));
             logger.info("clientMessage is: " + JSON.toJSONString(dto));
         }
     }
+
+    /*private void setMsg(){
+        ChannelHandlerContext ctx, DatagramPacket msg
+        ctx.writeAndFlush(new DatagramPacket(Unpooled.wrappedBuffer(JSON.toJSONString(temp).getBytes()), msg.sender()));
+    }*/
+
 
 }

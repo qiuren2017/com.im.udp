@@ -1,6 +1,7 @@
 package com.im.udp.server;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -21,7 +22,6 @@ public class UdpServer {
     public void start() throws Exception {
         try {
             channel = bootstrap.bind("localhost", port).sync().channel();
-            System.out.println("com.im.udp.server.UdpServer start success" + port);
             channel.closeFuture().await();
         } finally {
             acceptGroup.shutdownGracefully();
@@ -47,6 +47,7 @@ public class UdpServer {
         bootstrap.group(acceptGroup)
                 .channel(NioDatagramChannel.class)
                 .option(ChannelOption.SO_BROADCAST, true)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .handler(new ChannelInitializer<NioDatagramChannel>() {
                     @Override
                     protected void initChannel(NioDatagramChannel ch)
